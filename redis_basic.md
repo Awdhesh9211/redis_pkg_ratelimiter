@@ -211,3 +211,197 @@ redis-cli --cluster create 127.0.0.1:7000 127.0.0.1:7001 127.0.0.1:7002 --cluste
 
 ---
 
+# 📌 **All Redis Data Types and Their CRUD Operations (With Node.js Code Example)**
+
+Redis is an **In-Memory Data Store** used for high-speed data access. It supports various data types for storing and managing data. Here are the **CRUD (Create, Read, Update, Delete) operations for all Redis data types** explained with **Node.js code**.
+
+---
+
+## 🔹 **First, Set Up Redis in Node.js**  
+### 1️⃣ **Install Redis and Node.js**  
+First, install **Redis** and **Node.js**. Then, install the `redis` package:  
+```sh
+npm install redis
+```
+
+### 2️⃣ **Connect to Redis Client**  
+```js
+const redis = require("redis");
+const client = redis.createClient();
+
+client.on("connect", () => console.log("✅ Connected to Redis!"));
+client.on("error", (err) => console.log("❌ Redis Error: ", err));
+
+client.connect(); // Redis v4 syntax
+```
+
+---
+
+# 📌 **1. String (String)**
+## ✅ **CRUD Operations**
+```js
+// CREATE & UPDATE
+await client.set("name", "Awdhesh"); 
+
+// READ
+const name = await client.get("name");
+console.log("Name:", name); // Output: Awdhesh
+
+// DELETE
+await client.del("name");
+console.log("Deleted name!");
+```
+
+---
+
+# 📌 **2. List (List)**
+## ✅ **CRUD Operations**
+```js
+// CREATE (LPUSH - Add to the start, RPUSH - Add to the end)
+await client.lPush("tasks", "Task1", "Task2", "Task3");
+
+// READ (Get the list)
+const tasks = await client.lRange("tasks", 0, -1);
+console.log("Tasks:", tasks); // Output: ["Task3", "Task2", "Task1"]
+
+// UPDATE (Set by index)
+await client.lSet("tasks", 1, "Updated Task2");
+
+// DELETE (LPOP - Remove from the start, RPOP - Remove from the end)
+await client.lPop("tasks");
+console.log("Deleted first task!");
+```
+
+---
+
+# 📌 **3. Set (Set - Unique Values)**
+## ✅ **CRUD Operations**
+```js
+// CREATE
+await client.sAdd("colors", "Red", "Blue", "Green");
+
+// READ
+const colors = await client.sMembers("colors");
+console.log("Colors:", colors); // Output: ["Red", "Blue", "Green"]
+
+// UPDATE (Remove first, then add)
+await client.sRem("colors", "Blue");
+await client.sAdd("colors", "Yellow");
+
+// DELETE (Remove all values)
+await client.del("colors");
+console.log("Deleted all colors!");
+```
+
+---
+
+# 📌 **4. Sorted Set (Sorted Set)**
+## ✅ **CRUD Operations**
+```js
+// CREATE (ZADD - Add with score)
+await client.zAdd("scores", [
+  { score: 100, value: "Player1" },
+  { score: 200, value: "Player2" }
+]);
+
+// READ (Get by score)
+const scores = await client.zRangeWithScores("scores", 0, -1);
+console.log("Scores:", scores);
+
+// UPDATE (Update score)
+await client.zIncrBy("scores", 50, "Player1");
+
+// DELETE (Remove a player)
+await client.zRem("scores", "Player2");
+
+// DELETE (Remove entire data)
+await client.del("scores");
+```
+
+---
+
+# 📌 **5. Hash (Hash - Key-Value Pairs)**
+## ✅ **CRUD Operations**
+```js
+// CREATE
+await client.hSet("user:1", { name: "Awdhesh", age: 22 });
+
+// READ
+const user = await client.hGetAll("user:1");
+console.log("User:", user); // Output: { name: "Awdhesh", age: "22" }
+
+// UPDATE
+await client.hSet("user:1", "age", 23);
+
+// DELETE (Remove a field)
+await client.hDel("user:1", "age");
+
+// DELETE (Remove entire data)
+await client.del("user:1");
+```
+
+---
+
+# 📌 **6. Bitmaps (Bitmaps - Binary Data)**
+## ✅ **CRUD Operations**
+```js
+// CREATE & UPDATE (Set a bit)
+await client.setBit("attendance", 1, 1);
+
+// READ (Check the bit)
+const bit = await client.getBit("attendance", 1);
+console.log("Attendance:", bit); // Output: 1
+
+// DELETE (Remove entire data)
+await client.del("attendance");
+```
+
+---
+
+# 📌 **7. HyperLogLog (HyperLogLog - Approximate Counting)**
+## ✅ **CRUD Operations**
+```js
+// CREATE
+await client.pfAdd("unique_users", "User1", "User2", "User3");
+
+// READ (Get count)
+const count = await client.pfCount("unique_users");
+console.log("Unique Users:", count); 
+
+// DELETE (Remove entire data)
+await client.del("unique_users");
+```
+
+---
+
+# 📌 **8. Streams (Streams - Real-time Data)**
+## ✅ **CRUD Operations**
+```js
+// CREATE (XADD - Add data to the stream)
+await client.xAdd("mystream", "*", { user: "Awdhesh", message: "Hello Redis!" });
+
+// READ (XRANGE - Read the data)
+const messages = await client.xRange("mystream", "-", "+");
+console.log("Messages:", messages);
+
+// DELETE (Remove the stream)
+await client.del("mystream");
+```
+
+---
+
+# 🎯 **Conclusion**
+Redis is a **fast and powerful NoSQL data store** that supports various data types for storing and manipulating data. 
+
+| **Data Type**   | **Main Use**                            |
+|-----------------|-----------------------------------------|
+| String         | Simple Key-Value Store                 |
+| List           | Queue and Stack Operations             |
+| Set            | Store Unique Items                     |
+| Sorted Set     | Ranking System or Leaderboards         |
+| Hash           | Store Objects                          |
+| Bitmaps        | Boolean Flags and Presence Tracking    |
+| HyperLogLog    | Unique Count Estimation                |
+| Streams        | Real-time Data Logs and Events         |
+
+
